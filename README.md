@@ -32,50 +32,62 @@ This is problematic from multiple standpoints:
   - Why not have a unified case for success:
     ```elm
     type alias Fallible a =
-        Or { result : a, warnings : List Warning } Error
+        Or { result : a, warnings : List RecoverableError }
+           UnrecoverableError
     ```
   - Who tells you that "first" means "success" and "second" means "error"? (or the other way round?)
   - Why not use descriptive names:
     ```elm
     type Fallible a
-        = Success { result : a, warnings : List Warning }
-        | UnrecoverableError Error
+        = Success { result : a, errors : List RecoverableError }
+        | UnrecoverableError UnrecoverableError
     ```
 
 ## ✔️ use-cases
 
 [`AndOr`](AndOr#AndOr) and [`Or`](Or#Or) are useful for generic operations where no descriptive names exist –
-similar to how tuples are used for a partition result because there is no information
+similar to how tuples are used for partition results because there is no information
 on what each side means.
 
   - generic diffs
       - see [`KeysSet.fold2From`](https://dark.elm.dmy.fr/packages/lue-bird/elm-keysset/latest/KeysSet#fold2From) which is similar to `Dict.merge` but more comprehensible and easier to work with thanks to [`AndOr`](AndOr#AndOr)
-  - map2 for a structure (List, Array, ...) where overflow elements aren't disregarded:
+  - map2 where overflow elements aren't disregarded:
     ```elm
     List.AndOr.map2 : (AndOr a b -> c) -> ( List a, List b ) -> List c
     List.AndOr.map2 combine lists =
         case lists of
-            ( firstList, [] ) ->
-                firstList |> List.map (\first -> Only (Or.First first) |> combine)
-            ( [], secondList ) ->
-                secondList |> List.map (\first -> Only (Or.Second first) |> combine)
+            ( firsts, [] ) ->
+                firsts
+                    |> List.map
+                        (\first -> Only (Or.First first) |> combine)
+            
+            ( [], seconds ) ->
+                seconds
+                    |> List.map
+                        (\first -> Only (Or.Second first) |> combine)
+            
             ( firstHead :: firstTail, secondHead :: secondTail ) ->
-                AndOr.Both firstHead secondHead |> combine |> map2BothOrOnly firstTail secondTail
+                (AndOr.Both firstHead secondHead |> combine)
+                  :: List.AndOr.map2 combine firstTail secondTail
     ```
-  - type-safe partitioning for a structure (List, Array, ...):
+  - type-safe partitioning
     ```elm
     List.Or.partition : (a -> Or first second) -> (List a -> ( List first, List second ))
-    List.Or.partition chooseSide =
-        \list ->
-            case list of
-                [] ->
-                    []
-                head :: tail ->
-                    case head |> chooseSide of
-                        Or.First headFirst ->
-                            tail |> List.Or.partition |> Tuple.mapFirst ((::) headFirst)
-                        Or.Second headSecond ->
-                            tail |> List.Or.partition |> Tuple.mapSecond ((::) headSecond)
+    List.Or.partition chooseSide list =
+        case list of
+            [] ->
+                []
+            
+            head :: tail ->
+                let
+                    consHead =
+                        case head |> chooseSide of
+                            Or.First headFirst ->
+                                Tuple.mapFirst ((::) headFirst)
+                            Or.Second headSecond ->
+                                Tuple.mapSecond ((::) headSecond)
+                in
+                tail |> List.Or.partition chooseSide |> consHead
     ```
 
 ## prior art – [`AndOr`](AndOr)
