@@ -50,7 +50,7 @@ type AndOr first second
 Prefer a `case..of` if you handle both cases
 
 -}
-onBothAlter : (( first, second ) -> ( first, second )) -> (AndOr first second -> AndOr first second)
+onBothAlter : (And first second -> And first second) -> (AndOr first second -> AndOr first second)
 onBothAlter bothChange =
     \andOr ->
         case andOr of
@@ -102,7 +102,7 @@ onOnlyAlter onlyChange =
 Prefer a `case..of` if you handle both cases
 
 -}
-justOnBoth : AndOr first second -> Maybe ( first, second )
+justOnBoth : AndOr first second -> Maybe (And first second)
 justOnBoth =
     \andOr ->
         case andOr of
