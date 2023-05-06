@@ -15,7 +15,19 @@ module And exposing
 -}
 
 
-{-| Both a first and second part, conveniently represented as a tuple
+{-| Both a first and second part, conveniently represented as a tuple.
+
+Using this type instead of a tuple
+visually unifies it with all the other types such as `List`, `Maybe`, or `Result`.
+
+This in my opinion reads a tad better, especially as a type argument:
+
+    List (Maybe ( String, Int ))
+
+becomes:
+
+    List (Maybe (And String Int))
+
 -}
 type alias And first second =
     ( first, second )
