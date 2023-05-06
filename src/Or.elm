@@ -15,7 +15,7 @@ module Or exposing
 @docs value
 
 
-## alter
+## change
 
 @docs onFirstMap, onSecondMap
 
