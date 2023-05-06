@@ -80,12 +80,13 @@ on what each side means.
             
             head :: tail ->
                 let
+                    consHead : ( List first, List second ) -> ( List first, List second )
                     consHead =
                         case head |> chooseSide of
-                            Or.First headFirst ->
-                                Tuple.mapFirst ((::) headFirst)
-                            Or.Second headSecond ->
-                                Tuple.mapSecond ((::) headSecond)
+                            First first ->
+                                And.firstMap ((::) first)
+                            Second second ->
+                                And.secondMap ((::) second)
                 in
                 tail |> List.Or.partition chooseSide |> consHead
     ```

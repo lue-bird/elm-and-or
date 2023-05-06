@@ -9,7 +9,7 @@ module AndOr exposing
 @docs AndOr
 
 
-## alter
+## change
 
 @docs onBothAlter, onOnlyAlter
 
@@ -20,6 +20,7 @@ module AndOr exposing
 
 -}
 
+import And exposing (And)
 import Or exposing (Or)
 
 
@@ -29,7 +30,7 @@ When (not) to use this? → [readme](https://dark.elm.dmy.fr/packages/lue-bird/e
 
 -}
 type AndOr first second
-    = Both ( first, second )
+    = Both (And first second)
     | Only (Or first second)
 
 
