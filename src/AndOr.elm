@@ -24,7 +24,7 @@ import And exposing (And)
 import Or exposing (Or)
 
 
-{-| Either both or only the [first or second](Or#Or).
+{-| Either [both](And#And) or only the [first or second](Or#Or).
 
 When (not) to use this? → [readme](https://dark.elm.dmy.fr/packages/lue-bird/elm-and-or/latest/)
 
